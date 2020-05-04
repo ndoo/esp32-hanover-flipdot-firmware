@@ -21,8 +21,8 @@ void Hanover_Flipdot::begin(void)
     pinMode(PIN_ENABLE3, OUTPUT);
     pinMode(PIN_ENABLE4, OUTPUT);
     pinMode(PIN_ROW_ADVANCE, OUTPUT);
-    pinMode(PIN_COL_ADVANCE, OUTPUT);
-    pinMode(PIN_RESET, OUTPUT);
+    pinMode(PIN_COL_ADVANCE_ROW_RESET, OUTPUT);
+    pinMode(PIN_COL_RESET, OUTPUT);
     pinMode(PIN_SET_UNSET, OUTPUT);
     pinMode(PIN_COIL_DRIVE, OUTPUT);
 
@@ -37,15 +37,15 @@ void Hanover_Flipdot::begin(void)
     digitalWrite(PIN_ENABLE3, LOW);
     digitalWrite(PIN_ENABLE4, LOW);
     digitalWrite(PIN_ROW_ADVANCE, LOW);
-    digitalWrite(PIN_COL_ADVANCE, LOW);
-    digitalWrite(PIN_RESET, LOW);
+    digitalWrite(PIN_COL_ADVANCE_ROW_RESET, LOW);
+    digitalWrite(PIN_COL_RESET, LOW);
     digitalWrite(PIN_SET_UNSET, LOW);
     digitalWrite(PIN_COIL_DRIVE, LOW);
 
     // Set GPIO pins of status LEDs to high (lamp test)
-    digitalWrite(PIN_LED_A, HIGH);
-    digitalWrite(PIN_LED_B, HIGH);
-    digitalWrite(PIN_LED_C, HIGH);
+    digitalWrite(PIN_LED_A, LED_DEBUG ? HIGH : LOW);
+    digitalWrite(PIN_LED_B, LED_DEBUG ? HIGH : LOW);
+    digitalWrite(PIN_LED_C, LED_DEBUG ? HIGH : LOW);
 
     clear();
     writeDisplayParallel();
@@ -62,6 +62,11 @@ uint8_t Hanover_Flipdot::getHeight(void)
 
 void Hanover_Flipdot::enable(uint8_t db)
 {
+    // Clear row and column resets
+    digitalWrite(PIN_COL_ADVANCE_ROW_RESET, LOW);
+    digitalWrite(PIN_COL_RESET, LOW); // Clear column reset after row, as calling row reset advances column
+
+    // Enable (unlatch) dot board after clearing resets
     switch (db)
     {
     case 0:
@@ -83,11 +88,15 @@ void Hanover_Flipdot::enable(uint8_t db)
         digitalWrite(PIN_ENABLE4, HIGH);
         break;
     }
-    delayMicroseconds(PULSE_ENABLE_WAIT);
 }
 
 void Hanover_Flipdot::disable(uint8_t db)
 {
+    // Hold row and column counters in reset
+    digitalWrite(PIN_COL_ADVANCE_ROW_RESET, HIGH);
+    digitalWrite(PIN_COL_RESET, HIGH); // Hold column in reset after row, as calling row reset advances column
+
+    // Latch dot board after holding reset to keep them reset state while pulsing other dot boards
     switch (db)
     {
     case 0:
@@ -111,46 +120,36 @@ void Hanover_Flipdot::disable(uint8_t db)
     }
 }
 
-void Hanover_Flipdot::reset(void)
-{
-    digitalWrite(PIN_RESET, HIGH);
-    delayMicroseconds(PULSE_RST_HIGH);
-    digitalWrite(PIN_RESET, LOW);
-    delayMicroseconds(PULSE_LOW);
-}
-
 void Hanover_Flipdot::advanceRow(void)
 {
     digitalWrite(PIN_ROW_ADVANCE, HIGH);
-    digitalWrite(PIN_LED_B, HIGH);
+    if (LED_DEBUG) digitalWrite(PIN_LED_B, HIGH);
     delayMicroseconds(PULSE_ROW_HIGH);
     digitalWrite(PIN_ROW_ADVANCE, LOW);
-    digitalWrite(PIN_LED_B, LOW);
-    delayMicroseconds(PULSE_LOW);
+    if (LED_DEBUG) digitalWrite(PIN_LED_B, LOW);
 }
 
 void Hanover_Flipdot::advanceCol(void)
 {
-    digitalWrite(PIN_COL_ADVANCE, HIGH);
-    digitalWrite(PIN_LED_C, HIGH);
+    digitalWrite(PIN_COL_ADVANCE_ROW_RESET, HIGH);
+    if (LED_DEBUG) digitalWrite(PIN_LED_C, HIGH);
     delayMicroseconds(PULSE_COL_HIGH);
-    digitalWrite(PIN_COL_ADVANCE, LOW);
-    digitalWrite(PIN_LED_C, LOW);
-    delayMicroseconds(PULSE_LOW);
+    digitalWrite(PIN_COL_ADVANCE_ROW_RESET, LOW);
+    if (LED_DEBUG) digitalWrite(PIN_LED_C, LOW);
 }
 
 void Hanover_Flipdot::writeDot(uint8_t col, uint8_t row)
 {
     digitalWrite(PIN_SET_UNSET, db_buffer[col][row] ^ DB_INVERT ? HIGH : LOW);
     digitalWrite(PIN_COIL_DRIVE, HIGH);
-    digitalWrite(PIN_LED_A, HIGH);
+    if (LED_DEBUG) digitalWrite(PIN_LED_A, HIGH);
 
     delayMicroseconds(db_buffer[col][row] ? PULSE_COIL_ON : PULSE_COIL_OFF);
+    db_displayed[col][row] = db_buffer[col][row];
 
     digitalWrite(PIN_COIL_DRIVE, LOW);
-    digitalWrite(PIN_LED_A, LOW);
+    if (LED_DEBUG) digitalWrite(PIN_LED_A, LOW);
 
-    db_displayed[col][row] = db_buffer[col][row];
 
     delayMicroseconds(DB_THROTTLE);
 }
@@ -158,7 +157,6 @@ void Hanover_Flipdot::writeDot(uint8_t col, uint8_t row)
 void Hanover_Flipdot::writeDisplayParallel(void)
 {
     enable(5);
-    reset();
     // Iterate dot board
     for (uint col = 0; col < DB_ROWS; col++)
     {
@@ -171,10 +169,6 @@ void Hanover_Flipdot::writeDisplayParallel(void)
         if (col < DB_ROWS)
         {
             advanceCol();
-        }
-        else
-        {
-            reset();
         }
     }
     disable(5);
@@ -201,35 +195,46 @@ void Hanover_Flipdot::writeDisplay(void)
 {
 
     uint8_t db = 0;
+    uint8_t row_backlog;
+    uint8_t col_backlog;
 
     // For each dot board - x
     for (uint8_t db_x = 0; db_x < DB_X; db_x++)
     {
-
         // For each dot board - y
         for (uint8_t db_y = 0; db_y < DB_Y; db_y++)
         {
+
+            enable(db);
+            
             uint8_t col_start = db_x * DB_COLS;
             uint8_t col_end = col_start + DB_COLS;
 
             uint8_t row_start = db_y * DB_ROWS;
             uint8_t row_end = row_start + DB_ROWS;
 
-            // Enable dot board
-            enable(db);
-            reset();
             // Iterate dot board
+            col_backlog = 0;
             for (uint8_t col = col_start; col < col_end; col++)
             {
+                row_backlog = 0;
                 for (uint8_t row = row_start; row < row_end; row++)
                 {
-                    if (db_buffer[col][row] != db_displayed[col][row]) writeDot(col, row);
-                    advanceRow();
+                    if (db_buffer[col][row] != db_displayed[col][row]) {
+                        
+                        // Increment to match
+                        for (uint8_t cb = 0; cb < col_backlog; cb++) advanceCol();
+                        for (uint8_t rb = 0; rb < row_backlog; rb++) advanceRow();
+                        row_backlog = 0;
+                        col_backlog = 0;
+
+                        writeDot(col, row);
+                    }
+                    row_backlog++;
                 }
-                advanceCol();
+                col_backlog++;
             }
             // Disable dot board
-            reset();
             disable(db);
             db++;
         }

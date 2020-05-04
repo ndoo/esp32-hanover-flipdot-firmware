@@ -13,12 +13,12 @@
 #define DB_COLS 32
 
 // Number of dot-boards
-#define DB_X 1
+#define DB_X 2
 #define DB_Y 1
 
 // Other dot board settings
 #define DB_INVERT 1
-#define DB_THROTTLE 100 // For aesthetics, to save power, or to give time for core magnetic saturation
+#define DB_THROTTLE 0 // For aesthetics, to save power, or to give time for core magnetic saturation
 
 // GPIO pin definitions - dot board
 #define PIN_ENABLE1 15
@@ -26,24 +26,22 @@
 #define PIN_ENABLE3 12
 #define PIN_ENABLE4 14
 #define PIN_ROW_ADVANCE 33
-#define PIN_COL_ADVANCE 27
-#define PIN_RESET 26
+#define PIN_COL_ADVANCE_ROW_RESET 27
+#define PIN_COL_RESET 26
 #define PIN_SET_UNSET 25
 #define PIN_COIL_DRIVE 2
 
 // GPIO pin definitions - status LEDs
+#define LED_DEBUG true
 #define PIN_LED_A 23
 #define PIN_LED_B 19
 #define PIN_LED_C 22
 
 // Timings (µS)
-#define PULSE_ENABLE_WAIT 10 // Capacitance on disable line causes stray dot activation on previous dotboard
-#define PULSE_RST_HIGH 10
-#define PULSE_ROW_HIGH 10
-#define PULSE_COL_HIGH 20
-#define PULSE_LOW 10
-#define PULSE_COIL_ON 180
-#define PULSE_COIL_OFF 130
+#define PULSE_ROW_HIGH 0
+#define PULSE_COL_HIGH 0
+#define PULSE_COIL_ON 170
+#define PULSE_COIL_OFF 150
 
 // Buffers
 typedef uint8_t db_column_t[DB_ROWS * DB_Y];
@@ -69,7 +67,6 @@ public:
 private:
     void enable(uint8_t db);
     void disable(uint8_t db);
-    void reset(void);
     void writeDot(uint8_t col, uint8_t row);
     void advanceRow(void);
     void advanceCol(void);
