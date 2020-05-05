@@ -19,6 +19,13 @@ The following considerations went into the PCB schematic and layout:
 
 ## PCBA Notes
 
+### Time/Money Saving
+
+I strongly suggest removing the following items from the PCBA BoM, as they are generic 2.54mm through-hole parts and can be easily sourced at a local dealer:
+
+* J2: CONN HEADER R/A 14POS 2.54MM
+* J3: DIP Black Male Header VERT
+
 ### Dot-board Ribbon Cable
 
 J2 is specified as a 2x7 pin 2.54mm pitch shrouded header for IDC cables, so a matching 2x7 pin 2.54mm pitch IDC connector must be retrofitted on the original Hanover dot-board ribbon cable.
