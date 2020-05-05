@@ -5,6 +5,10 @@
 .vscode/launch.json
 .vscode/ipch
 
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
 # Ignore list for Eagle, a PCB layout tool
 
 # Backup files

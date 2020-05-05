@@ -1,8 +1,6 @@
 #!/usr/bin/python
 
-from PIL import Image   # install with `pip install pillow`
 from os import path
-from time import sleep
 
 import socket
 import struct
@@ -10,29 +8,9 @@ import sys
 import time
 import cv2
 
+import lib.imageToBinary as i2b
+
 multicast_group = ('239.1.2.3', 8080)
-
-# IMAGE CONVERSION ---------------------------------------------------------
-
-# Currently handles two modes of image conversion for specific projects:
-# 1. Convert bitmap (2-color) image to PROGMEM array for Adafruit_GFX
-#    drawBitmap() function.
-# 2. Convert color or grayscale image to 5/6/5 color PROGMEM array for
-#    NeoPixel animation (e.g. CircuitPlaygroundMakeBelieve project).
-
-def imageToBinary(im):
-  im = im.convert("1")
-  im = im.transpose(Image.ROTATE_180)
-  pixels = im.load()
-  binarystr = 0
-
-  for y in range(im.size[1]):
-    for x in range(im.size[0]):
-      binarystr = binarystr << 1
-      if pixels[x, y] > 0:
-        binarystr += 1
-
-  return binarystr.to_bytes(256, byteorder='little')
 
 if len(sys.argv) != 2:
   print("Usage: " + sys.argv[0] + " [video file]")
@@ -50,18 +28,8 @@ count = 0
 start = time.time()
 
 while success:
-  if cv2.waitKey(1) & 0xFF == ord('q'):
-    break
 
-  cv2_im = cv2.resize(cv2_im, (64, 32), cv2.INTER_LANCZOS4)
-  cv2.imshow('Output', cv2.resize(cv2_im, (cv2_im.shape[1] * 16, cv2_im.shape[0] * 16), cv2.INTER_NEAREST))
-
-  cv2_im = cv2.cvtColor(cv2_im, cv2.COLOR_BGR2GRAY)
-  cv2_im = cv2.adaptiveThreshold(cv2_im,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
-            cv2.THRESH_BINARY,11,2)
-
-  sock.sendto(imageToBinary(Image.fromarray(cv2_im)), multicast_group)
-
+  sock.sendto(i2b.imageToBinary(cv2_im, 64, 32), multicast_group)
   vidcap.set(cv2.CAP_PROP_POS_MSEC,(time.time()-start)*1000)
   success,cv2_im = vidcap.read()
 
@@ -71,4 +39,4 @@ while success:
     vidcap.set(cv2.CAP_PROP_POS_MSEC,0)
     success,cv2_im = vidcap.read()
 
-  sleep(0.2)
+  time.sleep(0.2)
