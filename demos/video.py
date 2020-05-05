@@ -8,9 +8,12 @@ import sys
 import time
 import cv2
 
-import lib.imageToBinary as i2b
+from lib import imageToBinary as i2b
 
-multicast_group = ('239.1.2.3', 8080)
+MULTICAST_GROUP = ('239.1.2.3', 8080)
+
+WIDTH = 64
+HEIGHT = 32
 
 if len(sys.argv) != 2:
   print("Usage: " + sys.argv[0] + " [video file]")
@@ -29,13 +32,13 @@ start = time.time()
 
 while success:
 
-  sock.sendto(i2b.imageToBinary(cv2_im, 64, 32), multicast_group)
+  sock.sendto(i2b.imageToBinary(cv2_im, WIDTH, HEIGHT, True, True), MULTICAST_GROUP)
   vidcap.set(cv2.CAP_PROP_POS_MSEC,(time.time()-start)*1000)
   success,cv2_im = vidcap.read()
 
   if not success and time.time()-start > 0:
     success = True
-    start = time.time();
+    start = time.time()
     vidcap.set(cv2.CAP_PROP_POS_MSEC,0)
     success,cv2_im = vidcap.read()
 
