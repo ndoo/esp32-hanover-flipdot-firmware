@@ -12,7 +12,7 @@ from lib import imageToBinary as i2b
 
 MULTICAST_GROUP = ('239.1.2.3', 8080)
 
-WIDTH = 64
+WIDTH = 96
 HEIGHT = 32
 
 if len(sys.argv) != 2:
@@ -42,4 +42,4 @@ while success:
     vidcap.set(cv2.CAP_PROP_POS_MSEC,0)
     success,cv2_im = vidcap.read()
 
-  time.sleep(0.2)
+  time.sleep(0.05)

@@ -19,7 +19,7 @@ import cv2
 import lib.imageToBinary as i2b
 
 MULTICAST_GROUP = ('239.1.2.3', 8080)
-WIDTH = 64
+WIDTH = 96
 HEIGHT = 32
 WHITE = 1
 BLACK = 0
@@ -35,15 +35,11 @@ clock_font = ImageFont.truetype('fonts/KHARON4A.ttf', 8)
 clock_font_small = ImageFont.truetype('fonts/fixed_01.ttf', 8)
 clock_font_large = ImageFont.truetype('fonts/KHARB___.ttf', 8)
 
-previous_second = 0
+previous_second = -1
 
 while True:
-  while True:
-    now = datetime.today()
-    if now.second != previous_second:
-      break
-    time.sleep(0.1)
-
+  time.sleep(datetime.today().microsecond / 1000000)
+  now = datetime.today()
   t = time.strftime('%H:%M:%S')
   draw.rectangle((0, 0, WIDTH, HEIGHT), fill=BLACK, outline=BLACK)
   draw.text((0, -3), now.strftime('%A'), fill=WHITE, font=clock_font_large)
@@ -51,4 +47,4 @@ while True:
   draw.text((3, 24), '{}-{:02d}-{:02d}'.format(now.year, now.day, now.month), fill=WHITE, font=clock_font_small)
   cv2_im = numpy.array(image.convert('RGB'))
   cv2_im = cv2_im[:, :, ::-1].copy() 
-  sock.sendto(i2b.imageToBinary(cv2_im, 64, 32, False), MULTICAST_GROUP)
+  sock.sendto(i2b.imageToBinary(cv2_im, WIDTH, HEIGHT, False), MULTICAST_GROUP)
