@@ -3469,7 +3469,7 @@ Alternatively, you can use the built-in Seeed Fusion CAM file. Find it under &lt
 <part name="C2" library="OPL_Capacitor" library_urn="urn:adsk.eagle:library:8004261" deviceset="CERAMIC-10UF-6.3V-20%-X5R(0402)" device="" package3d_urn="urn:adsk.eagle:package:8004285/1" value="10uf"/>
 <part name="GND3" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="E1" library="SparkFun-RF" library_urn="urn:adsk.eagle:library:531" deviceset="ANTENNA-GROUNDED" device="TRACE-15.2MM" package3d_urn="urn:adsk.eagle:package:39575/1"/>
-<part name="RST" library="OPL_Switch" library_urn="urn:adsk.eagle:library:8004989" deviceset="SMD-BUTTON(2P-3.0X2.5X1.2+0.4MM)" device="-B3U-1000P-2P-SMD" package3d_urn="urn:adsk.eagle:package:8005100/1" value="B3U-1000P-2P-SMD"/>
+<part name="RST" library="OPL_Switch" library_urn="urn:adsk.eagle:library:8004989" deviceset="SMD-BUTTON(2P-3.0X2.5X1.2+0.4MM)" device="-B3U-1000P-2P-SMD" package3d_urn="urn:adsk.eagle:package:8005100/1" value="TD-1183SN-A3N-D1R"/>
 <part name="R3" library="OPL_Resistor" library_urn="urn:adsk.eagle:library:8004883" deviceset="SMD-RES-10K-1%-1/16W(0402)" device="" package3d_urn="urn:adsk.eagle:package:8004940/1" value="10K 1/16W"/>
 <part name="+3V3" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+3V3" device=""/>
 <part name="GND4" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
@@ -3489,10 +3489,10 @@ Alternatively, you can use the built-in Seeed Fusion CAM file. Find it under &lt
 <part name="GND9" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="J1" library="OPL_Connector_DC-005_No_Polarity_Markings" deviceset="JACK-DC-005" device="'DC-005'" package3d_urn="urn:adsk.eagle:package:8004569/2" value="DC-005"/>
 <part name="R4" library="OPL_Resistor" library_urn="urn:adsk.eagle:library:8004883" deviceset="SMD-RES-10K-1%-1/16W(0402)" device="" package3d_urn="urn:adsk.eagle:package:8004940/1" value="10K 1/16W"/>
-<part name="PGM" library="OPL_Switch" library_urn="urn:adsk.eagle:library:8004989" deviceset="SMD-BUTTON(2P-3.0X2.5X1.2+0.4MM)" device="-B3U-1000P-2P-SMD" package3d_urn="urn:adsk.eagle:package:8005100/1" value="B3U-1000P-2P-SMD"/>
+<part name="PGM" library="OPL_Switch" library_urn="urn:adsk.eagle:library:8004989" deviceset="SMD-BUTTON(2P-3.0X2.5X1.2+0.4MM)" device="-B3U-1000P-2P-SMD" package3d_urn="urn:adsk.eagle:package:8005100/1" value="TD-1183SN-A3N-D1R"/>
 <part name="GND10" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
-<part name="U3" library="LM2576 (1)" deviceset="LM2576" device="S"/>
-<part name="CT1" library="OPL_Capacitor" library_urn="urn:adsk.eagle:library:8004261" deviceset="ALUMINUM-SMD-220UF-16V(D6.3-H7.7MM)" device="" package3d_urn="urn:adsk.eagle:package:8004282/1" value="220UF">
+<part name="U3" library="LM2576 (1)" deviceset="LM2576" device="S" value="LM2576SX-5.0/NOPB"/>
+<part name="CT1" library="OPL_Capacitor" library_urn="urn:adsk.eagle:library:8004261" deviceset="ALUMINUM-SMD-220UF-16V(D6.3-H7.7MM)" device="" package3d_urn="urn:adsk.eagle:package:8004282/1" value="100UF">
 <attribute name="MPN" value="302030000"/>
 </part>
 <part name="GND11" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
@@ -3500,7 +3500,7 @@ Alternatively, you can use the built-in Seeed Fusion CAM file. Find it under &lt
 <part name="GND12" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="D1" library="OPL_Discrete_Semiconductor" library_urn="urn:adsk.eagle:library:8004488" deviceset="SMD-DIODE-SCHOTTKY-28V-5A(DO-214AA)" device="" package3d_urn="urn:adsk.eagle:package:8004541/1" value="28V-5A"/>
 <part name="CT2" library="OPL_Capacitor" library_urn="urn:adsk.eagle:library:8004261" deviceset="ALUMINUM-SMD-220UF-16V(D6.3-H7.7MM)" device="" package3d_urn="urn:adsk.eagle:package:8004282/1" value="220UF"/>
-<part name="L1" library="SparkFun-Coils" library_urn="urn:adsk.eagle:library:512" deviceset="INDUCTOR" device="-CR54-3.3UH" package3d_urn="urn:adsk.eagle:package:37572/1" value="3.3µH/±30%/3.4A"/>
+<part name="L1" library="SparkFun-Coils" library_urn="urn:adsk.eagle:library:512" deviceset="INDUCTOR" device="-CR54-3.3UH" package3d_urn="urn:adsk.eagle:package:37572/1" value="220uH"/>
 <part name="D2" library="OPL_Optoelectronics" library_urn="urn:adsk.eagle:library:8004780" deviceset="SMD-LED-YELLOW-DIFFUSED-PURE-WHITE(0402)" device="" package3d_urn="urn:adsk.eagle:package:8004828/1" value="PURE-WHITE-0402"/>
 <part name="D3" library="OPL_Optoelectronics" library_urn="urn:adsk.eagle:library:8004780" deviceset="SMD-LED-YELLOW-DIFFUSED-PURE-WHITE(0402)" device="" package3d_urn="urn:adsk.eagle:package:8004828/1" value="PURE-WHITE-0402"/>
 <part name="D4" library="OPL_Optoelectronics" library_urn="urn:adsk.eagle:library:8004780" deviceset="SMD-LED-YELLOW-DIFFUSED-PURE-WHITE(0402)" device="" package3d_urn="urn:adsk.eagle:package:8004828/1" value="PURE-WHITE-0402"/>
