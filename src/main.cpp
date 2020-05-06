@@ -22,6 +22,8 @@ Hanover_Flipdot flipdot = Hanover_Flipdot();
 AsyncUDP udp;
 IPAddress multicastGroup = IPAddress(239, 1, 2, 3);
 
+bool panelOverride = false;
+
 void configModeCallback(WiFiManager *myWiFiManager)
 {
     flipdot.clear();
@@ -32,6 +34,9 @@ void configModeCallback(WiFiManager *myWiFiManager)
 
 void onUdpPacket(AsyncUDPPacket packet)
 {
+
+    if (panelOverride) return;
+
     uint16_t len = (uint16_t) flipdot.getWidth() * flipdot.getHeight() / 8;
 
     if (packet.length() != len)
@@ -58,8 +63,11 @@ void connectToUdp()
     if (udp.listenMulticast(multicastGroup, UDP_PORT))
     {
         // Power optimizations
-        WiFi.setSleep(false);
         setCpuFrequencyMhz(80);
+
+        // Uncomment for better receive performance, e.g. for videos
+        // ESP32 may get hot!
+        WiFi.setSleep(false);
 
         // UDP handler function
         udp.onPacket(onUdpPacket);
@@ -103,11 +111,37 @@ void setup()
     wifiManager.setHostname("Hanover-Flipdot");
     wifiManager.autoConnect();
 
-    ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    ArduinoOTA.onStart([]() {
+            panelOverride = true;
+            String type;
+            if (ArduinoOTA.getCommand() == U_FLASH) {
+            type = "FW";
+            } else { // U_FS
+            type = "FS";
+            }
+            flipdot.clear();
+            flipdot.setCursor(0, 5);
+            flipdot.print("OTA " + type);
+            flipdot.writeDisplay();
+        })
+        .onProgress([](unsigned int progress, unsigned int total) {
             flipdot.clear();
             flipdot.setCursor(0, 5);
             flipdot.printf("OTA %u%%", (progress / (total / 100)));
             flipdot.writeDisplay();
+        })
+        .onEnd([]() {
+            flipdot.clear();
+            flipdot.setCursor(0, 5);
+            flipdot.print("OTA success!");
+            flipdot.writeDisplay();
+        })
+        .onError([](ota_error_t error) {
+            flipdot.clear();
+            flipdot.setCursor(0, 5);
+            flipdot.printf("Err[%u] ", error);
+            flipdot.writeDisplay();
+            panelOverride = false;
         });
 
     ArduinoOTA.begin();

@@ -13,12 +13,17 @@
 #define DB_COLS 32
 
 // Number of dot-boards
-#define DB_X 2
+#define DB_X 3
 #define DB_Y 1
 
 // Other dot board settings
 #define DB_INVERT 1
 #define DB_THROTTLE 0 // For aesthetics, to save power, or to give time for core magnetic saturation
+
+// Delay to ensure stability for >1 dot board (exponential for every additional board)
+#define DB_SEQ_THROTTLE_COIL 15 // Extra pulse time for each dot board coil pulse
+#define DB_SEQ_THROTTLE_ADVANCE 0 // Extra pulse time for each advance pulse
+#define DB_SEQ_THROTTLE_LATCH 0 // Extra pulse time for each dot board to latch/unlatch
 
 // GPIO pin definitions - dot board
 #define PIN_ENABLE1 15
@@ -37,11 +42,12 @@
 #define PIN_LED_B 19
 #define PIN_LED_C 22
 
-// Timings (µS)
-#define PULSE_ROW_HIGH 0
-#define PULSE_COL_HIGH 0
-#define PULSE_COIL_ON 170
-#define PULSE_COIL_OFF 150
+// Timings (µS) - you can decrease coil pulse timings for an increase in speed, but dots may not reliably flip
+#define WAIT_LATCH 0
+#define PULSE_ADVANCE_HIGH 0
+#define PULSE_ADVANCE_LOW 0
+#define PULSE_COIL_ON 150  // Note that these are BEFORE inversion
+#define PULSE_COIL_OFF 180
 
 // Buffers
 typedef uint8_t db_column_t[DB_ROWS * DB_Y];
@@ -61,6 +67,7 @@ public:
     void writeDisplayParallel(void);
     void writeDisplay(void);
     void clear(void);
+    void fill(bool state);
     uint8_t getWidth(void);
     uint8_t getHeight(void);
 
