@@ -24,27 +24,37 @@ IPAddress multicastGroup = IPAddress(239, 1, 2, 3);
 
 bool panelOverride = false;
 
-void configModeCallback(WiFiManager *myWiFiManager)
+void debugText(String text, uint8_t seconds = 0)
 {
+    if (seconds)
+        flipdot.backup();
     flipdot.clear();
     flipdot.setCursor(0, 5);
-    flipdot.print("AP:\n" + myWiFiManager->getConfigPortalSSID());
+    flipdot.print(text);
     flipdot.writeDisplay();
+    if (seconds)
+    {
+        sleep(seconds);
+        flipdot.restore();
+        flipdot.writeDisplay();
+    }
+}
+
+void configModeCallback(WiFiManager *myWiFiManager)
+{
+    debugText("Setup: " + myWiFiManager->getConfigPortalSSID());
 }
 
 void onUdpPacket(AsyncUDPPacket packet)
 {
+    if (panelOverride)
+        return;
 
-    if (panelOverride) return;
-
-    uint16_t len = (uint16_t) flipdot.getWidth() * flipdot.getHeight() / 8;
-
+    uint16_t len = (uint16_t)flipdot.getWidth() * flipdot.getHeight() / 8;
     if (packet.length() != len)
         return;
 
-    uint8_t *payload = packet.data();
-    memcpy(flipdot.db_buffer, payload, len);
-
+    memcpy(flipdot.db_buffer, packet.data(), len);
     flipdot.writeDisplay();
 }
 
@@ -67,23 +77,22 @@ void connectToUdp()
 void WiFiEvent(WiFiEvent_t event)
 {
     Serial.printf("[WiFi-event] event: %d\n", event);
+    String ip_msg = "IP: ";
+    ip_msg += multicastGroup.toString() + "\nPort: " + UDP_PORT;
     switch (event)
     {
+    case SYSTEM_EVENT_STA_START:
+        debugText("Wi-Fi connecting", 3);
+        break;
     case SYSTEM_EVENT_STA_GOT_IP:
         connectToUdp();
-        flipdot.clear();
-        flipdot.setCursor(0, 5);
-        flipdot.println("Mcast:");
-        flipdot.println(multicastGroup);
-        flipdot.println("Port:");
-        flipdot.println(UDP_PORT);
-        flipdot.writeDisplay();
+        debugText(ip_msg);
         break;
     case SYSTEM_EVENT_STA_DISCONNECTED:
-        flipdot.clear();
-        flipdot.setCursor(0, 5);
-        flipdot.println("WiFi Lost");
-        flipdot.writeDisplay();
+        debugText("Wi-Fi lost", 3);
+        break;
+    case SYSTEM_EVENT_STA_LOST_IP:
+        debugText("Wi-Fi lost IP", 3);
         break;
     }
 }
@@ -104,36 +113,53 @@ void setup()
     wifiManager.autoConnect();
 
     ArduinoOTA.onStart([]() {
-            panelOverride = true;
-            String type;
-            if (ArduinoOTA.getCommand() == U_FLASH) {
-            type = "FW";
-            } else { // U_FS
-            type = "FS";
-            }
-            flipdot.clear();
-            flipdot.setCursor(0, 5);
-            flipdot.print("OTA " + type);
-            flipdot.writeDisplay();
-        })
+                  // Stash flipdot contents and lock display to prevent slowdown of OTA by synchronous display updates from UDP
+                  flipdot.backup();
+                  panelOverride = true;
+                  String type;
+                  if (ArduinoOTA.getCommand() == U_FLASH)
+                  {
+                      type = "FW";
+                  }
+                  else
+                  { // U_FS
+                      type = "FS";
+                  }
+                  debugText("OTA " + type);
+              })
         .onProgress([](unsigned int progress, unsigned int total) {
-            flipdot.clear();
-            flipdot.setCursor(0, 5);
-            flipdot.printf("OTA %u%%", (progress / (total / 100)));
-            flipdot.writeDisplay();
+            String ota_msg = "OTA ";
+            ota_msg += String(progress / (total / 100)) + "%";
+            debugText(ota_msg);
         })
         .onEnd([]() {
-            flipdot.clear();
-            flipdot.setCursor(0, 5);
-            flipdot.print("OTA success!");
-            flipdot.writeDisplay();
+            debugText("OTA success!");
         })
         .onError([](ota_error_t error) {
-            flipdot.clear();
-            flipdot.setCursor(0, 5);
-            flipdot.printf("Err[%u] ", error);
-            flipdot.writeDisplay();
+            String ota_msg = "OTA error " + String(error) + ":\n";
+            switch (error)
+            {
+            case OTA_AUTH_ERROR:
+                ota_msg += "Auth Failed";
+                break;
+            case OTA_BEGIN_ERROR:
+                ota_msg += "Begin Failed";
+                break;
+            case OTA_CONNECT_ERROR:
+                ota_msg += "Connect Failed";
+                break;
+            case OTA_RECEIVE_ERROR:
+                ota_msg += "Receive Failed";
+                break;
+            case OTA_END_ERROR:
+                ota_msg += "End Failed";
+                break;
+            }
+            debugText(ota_msg);
+            sleep(3);
             panelOverride = false;
+            flipdot.restore();
+            flipdot.writeDisplay();
         });
 
     ArduinoOTA.begin();

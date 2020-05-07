@@ -119,13 +119,6 @@ void Hanover_Flipdot::flipDot(bool state, uint8_t pulse_time)
 
     delayMicroseconds(DB_THROTTLE);
 }
-
-void Hanover_Flipdot::clear(void)
-{
-    for (uint8_t i = 0; i < DB_COLS * DB_BOARDS; i++)
-        db_buffer[i] = 0;
-}
-
 void Hanover_Flipdot::writeDisplay(void)
 {
     // Iterate dot boards
@@ -165,6 +158,24 @@ void Hanover_Flipdot::writeDisplay(void)
             col_backlog++;
         } // Iterate columns
     }     // Iterate dot boards
+}
+
+// Drawing helper functions
+
+void Hanover_Flipdot::clear(void)
+{
+    for (uint8_t i = 0; i < DB_COLS * DB_BOARDS; i++)
+        db_buffer[i] = 0;
+}
+
+void Hanover_Flipdot::backup(void)
+{
+    memcpy(db_backup, db_buffer, sizeof(db_buffer));
+}
+
+void Hanover_Flipdot::restore(void)
+{
+    memcpy(db_buffer, db_backup, sizeof(db_backup));
 }
 
 // Drawing functions (Adafruit GFX Primitives)

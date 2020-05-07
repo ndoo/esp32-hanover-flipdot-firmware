@@ -80,6 +80,8 @@
 
 #endif
 
+typedef uint32_t db_t[DB_COLS * DB_BOARDS];
+
 // Public subs
 void flipdot_init();
 
@@ -91,17 +93,20 @@ public:
     void drawPixel(int16_t x, int16_t y, uint16_t color);
     void writeDisplay(void);
     void clear(void);
+    void backup(void);
+    void restore(void);
     void fillScreen(uint16_t color);
     uint8_t getWidth(void);
     uint8_t getHeight(void);
-    uint32_t db_buffer[DB_COLS * DB_BOARDS];
+    db_t db_buffer;
 
 private:
     void enable(uint8_t db);
     void flipDot(bool state, uint8_t pulse_time);
     void advanceRow(void);
     void advanceCol(void);
-    uint32_t db_displayed[DB_COLS * DB_BOARDS];
+    db_t db_backup;
+    db_t db_displayed;
 };
 
 #endif // Hanover_Flipdot_h
