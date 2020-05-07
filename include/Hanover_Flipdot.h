@@ -21,8 +21,7 @@
 #define DB_COLS 32
 
 // Number of dot-boards
-#define DB_X 3
-#define DB_Y 1
+#define DB_BOARDS 4
 
 // Other dot board settings
 #define DB_INVERT 1
@@ -30,15 +29,10 @@
 
 // Delay to ensure stability for >1 dot board (exponential for every additional board)
 #define DB_SEQ_THROTTLE_COIL 15 // Extra pulse time for each dot board coil pulse
-#define DB_SEQ_THROTTLE_ADVANCE 0 // Extra pulse time for each advance pulse
-#define DB_SEQ_THROTTLE_LATCH 0 // Extra pulse time for each dot board to latch/unlatch
 
 // Timings (µS) - you can decrease coil pulse timings for an increase in speed, but dots may not reliably flip
-#define WAIT_LATCH 0
-#define PULSE_ADVANCE_HIGH 0
-#define PULSE_ADVANCE_LOW 0
-#define PULSE_COIL_ON 150  // Note that these are BEFORE inversion
-#define PULSE_COIL_OFF 180
+#define PULSE_COIL_ON 180  // Note that these are after inversion
+#define PULSE_COIL_OFF 150
 
 #if defined(PCB_ISSUE_B) || defined(PCB_ISSUE_C)
 
@@ -80,20 +74,14 @@
 
 // GPIO pin definitions - status LEDs
 #define LED_DEBUG true
-#define PIN_LED_A 34 // Won't work - GPIO is input-only
-#define PIN_LED_B 35 // Won't work - GPIO is input-only
+#define PIN_LED_A 32 // Actually wired to IO34 but it is input-only
+#define PIN_LED_B 32 // Actually wired to IO35 but it is input-only
 #define PIN_LED_C 32
 
 #endif
 
-// Buffers
-typedef uint8_t db_column_t[DB_ROWS * DB_Y];
-typedef db_column_t db_t[DB_COLS * DB_X];
-
 // Public subs
 void flipdot_init();
-void update_dotboard(db_t *dots, bool force);
-void update_dotboard(db_t *dots);
 
 class Hanover_Flipdot : public Adafruit_GFX
 {
@@ -101,19 +89,19 @@ public:
     Hanover_Flipdot(void);
     void begin();
     void drawPixel(int16_t x, int16_t y, uint16_t color);
-    void writeDisplayParallel(void);
     void writeDisplay(void);
     void clear(void);
-    void fill(bool state);
+    void fillScreen(uint16_t color);
     uint8_t getWidth(void);
     uint8_t getHeight(void);
+    uint32_t db_buffer[DB_COLS * DB_BOARDS];
 
 private:
     void enable(uint8_t db);
-    void disable(uint8_t db);
-    void writeDot(uint8_t col, uint8_t row);
+    void flipDot(bool state, uint8_t pulse_time);
     void advanceRow(void);
     void advanceCol(void);
+    uint32_t db_displayed[DB_COLS * DB_BOARDS];
 };
 
 #endif // Hanover_Flipdot_h

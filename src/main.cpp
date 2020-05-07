@@ -43,18 +43,8 @@ void onUdpPacket(AsyncUDPPacket packet)
         return;
 
     uint8_t *payload = packet.data();
+    memcpy(flipdot.db_buffer, payload, len);
 
-    for (uint16_t c = 0; c < len; c++)
-    {
-        char byte = payload[c];
-        for (uint8_t bit = 0; bit < 8; bit++)
-        {
-            uint8_t x = (c * 8 + bit) % flipdot.getWidth();
-            uint8_t y = (c * 8 + bit) / flipdot.getWidth();
-            flipdot.drawPixel(x, y, byte & 1);
-            byte = byte >> 1;
-        }
-    }
     flipdot.writeDisplay();
 }
 
@@ -99,6 +89,8 @@ void WiFiEvent(WiFiEvent_t event)
 }
 void setup()
 {
+
+    Serial.begin(115200);
 
     flipdot.begin();
     flipdot.setFont(&TomThumb);
