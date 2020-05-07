@@ -25,6 +25,8 @@ def imageToBinary(cv2_im, width: int, height: int, adaptive: bool = False, debug
 
   cv2_im[cv2_im >= 1] = 1
 
-  bytes = np.packbits(cv2_im, bitorder='little').tobytes()
+  cv2_im = np.rot90(cv2_im, 3);
+  cv2_im = np.fliplr(cv2_im);
+  cv2_im = np.packbits(cv2_im, bitorder='little')
 
-  return bytes
+  return cv2_im.tobytes()

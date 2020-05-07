@@ -12,7 +12,7 @@ from lib import imageToBinary as i2b
 
 MULTICAST_GROUP = ('239.1.2.3', 8080)
 
-WIDTH = 96
+WIDTH = 128
 HEIGHT = 32
 
 if len(sys.argv) != 2:

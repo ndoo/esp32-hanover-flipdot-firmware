@@ -19,7 +19,7 @@ import cv2
 import lib.imageToBinary as i2b
 
 MULTICAST_GROUP = ('239.1.2.3', 8080)
-WIDTH = 96
+WIDTH = 128
 HEIGHT = 32
 WHITE = 1
 BLACK = 0
