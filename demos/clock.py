@@ -31,9 +31,14 @@ sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
 
 image = Image.new('1', (WIDTH, HEIGHT))
 draw = ImageDraw.Draw(image)
-clock_font = ImageFont.truetype('fonts/KHARON4A.ttf', 8)
-clock_font_small = ImageFont.truetype('fonts/fixed_01.ttf', 8)
-clock_font_large = ImageFont.truetype('fonts/KHARB___.ttf', 8)
+clock_font = ImageFont.truetype('fonts/TEACPSS_.TTF', 8)
+clock_font_large = ImageFont.truetype('fonts/KHARB___.TTF', 8)
+
+def suffix(d):
+    return 'th' if 11<=d<=13 else {1:'st',2:'nd',3:'rd'}.get(d%10, 'th')
+
+def custom_strftime(format, t):
+    return t.strftime(format).replace('{S}', str(t.day) + suffix(t.day))
 
 previous_second = -1
 
@@ -41,10 +46,11 @@ while True:
   time.sleep(datetime.today().microsecond / 1000000)
   now = datetime.today()
   t = time.strftime('%H:%M:%S')
+
   draw.rectangle((0, 0, WIDTH, HEIGHT), fill=WHITE, outline=WHITE)
-  draw.text((0, -3), now.strftime('%A'), fill=BLACK, font=clock_font_large)
-  draw.text((2, 10), '{:02d}:{:02d}:{:02d}'.format(now.hour, now.minute, now.second), fill=BLACK, font=clock_font)
-  draw.text((3, 24), '{}-{:02d}-{:02d}'.format(now.year, now.day, now.month), fill=BLACK, font=clock_font_small)
+  draw.text((2, 1), now.strftime('%I:%M %p'), fill=BLACK, font=clock_font_large)
+  draw.text((3, 14), custom_strftime('%A, {S} %b', now), fill=BLACK, font=clock_font)
+
   cv2_im = numpy.array(image.convert('RGB'))
   cv2_im = cv2_im[:, :, ::-1].copy() 
   sock.sendto(i2b.imageToBinary(cv2_im, WIDTH, HEIGHT, False), MULTICAST_GROUP)
