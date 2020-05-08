@@ -31,8 +31,8 @@
 #define DB_SEQ_THROTTLE_COIL 15 // Extra pulse time for each dot board coil pulse
 
 // Timings (µS) - you can decrease coil pulse timings for an increase in speed, but dots may not reliably flip
-#define PULSE_COIL_ON 180  // Note that these are after inversion
-#define PULSE_COIL_OFF 150
+#define PULSE_COIL_ON 230  // Note that these are after inversion
+#define PULSE_COIL_OFF 220
 
 #if defined(PCB_ISSUE_B) || defined(PCB_ISSUE_C)
 
@@ -49,9 +49,9 @@
 
 // GPIO pin definitions - status LEDs
 #define LED_DEBUG true
-#define PIN_LED_A 23
-#define PIN_LED_B 19
-#define PIN_LED_C 22
+#define PIN_LED_COIL 23
+#define PIN_LED_ROW 19
+#define PIN_LED_COL 22
 
 #endif
 
@@ -74,9 +74,9 @@
 
 // GPIO pin definitions - status LEDs
 #define LED_DEBUG true
-#define PIN_LED_A 32 // Actually wired to IO34 but it is input-only
-#define PIN_LED_B 32 // Actually wired to IO35 but it is input-only
-#define PIN_LED_C 32
+#define PIN_LED_COIL 32 // Actually wired to IO34 but it is input-only
+#define PIN_LED_ROW 32 // Actually wired to IO35 but it is input-only
+#define PIN_LED_COL 32
 
 #endif
 
@@ -102,7 +102,8 @@ public:
 
 private:
     void enable(uint8_t db);
-    void flipDot(bool state, uint8_t pulse_time);
+    void disable(uint8_t db);
+    void flipDot(bool state, uint16_t pulse_time);
     void advanceRow(void);
     void advanceCol(void);
     db_t db_backup;
