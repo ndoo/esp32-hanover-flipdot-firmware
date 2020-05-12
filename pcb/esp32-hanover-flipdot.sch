@@ -3913,12 +3913,13 @@ Alternatively, you can use the built-in Seeed Fusion CAM file. Find it under &lt
 <pinref part="RST" gate="G$1" pin="2"/>
 <wire x1="78.74" y1="33.02" x2="78.74" y2="35.56" width="0.1524" layer="91"/>
 <pinref part="R3" gate="G$1" pin="1"/>
-<label x="73.66" y="35.56" size="1.778" layer="95" rot="R180"/>
+<label x="76.2" y="35.56" size="1.778" layer="95" rot="R180" xref="yes"/>
 <wire x1="78.74" y1="35.56" x2="78.74" y2="44.45" width="0.1524" layer="91"/>
 <wire x1="78.74" y1="35.56" x2="83.82" y2="35.56" width="0.1524" layer="91"/>
 <junction x="78.74" y="35.56"/>
 <wire x1="83.82" y1="35.56" x2="83.82" y2="31.75" width="0.1524" layer="91"/>
 <pinref part="C3" gate="G$1" pin="2"/>
+<wire x1="78.74" y1="35.56" x2="76.2" y2="35.56" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="GPIO22" class="0">
