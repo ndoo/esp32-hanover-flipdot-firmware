@@ -4,6 +4,10 @@
 
 Reference PCB is available at [ndoo/esp32-hanover-flipdot](https://github.com/ndoo/esp32-hanover-flipdot)
 
+## Demo Video
+
+[ESP32 Hanover Flip-dot Sign Controller - Demos](https://youtu.be/oSv1yEUelBg)
+
 ## Firmware
 
 ### IDE Prerequisites
