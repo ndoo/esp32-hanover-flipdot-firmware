@@ -7,7 +7,7 @@ from time import sleep
 
 MULTICAST_GROUP = ('239.1.2.3', 8080)
 
-WIDTH = 128
+WIDTH = 64
 HEIGHT = 32
 
 board_white = np.packbits(np.ones((WIDTH, HEIGHT), dtype=int)).tobytes()

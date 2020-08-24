@@ -7,12 +7,13 @@ import struct
 import sys
 import time
 import cv2
+import numpy as np
 
 from lib import imageToBinary as i2b
 
 MULTICAST_GROUP = ('239.1.2.3', 8080)
 
-WIDTH = 128
+WIDTH = 64
 HEIGHT = 32
 
 if len(sys.argv) != 2:
@@ -32,7 +33,7 @@ start = time.time()
 
 while success:
 
-  sock.sendto(i2b.imageToBinary(cv2_im, WIDTH, HEIGHT, True, True), MULTICAST_GROUP)
+  sock.sendto(i2b.imageToBinary(cv2_im, WIDTH, HEIGHT, True, False), MULTICAST_GROUP)
   vidcap.set(cv2.CAP_PROP_POS_MSEC,(time.time()-start)*1000)
   success,cv2_im = vidcap.read()
 
